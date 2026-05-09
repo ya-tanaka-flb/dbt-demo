@@ -1,42 +1,36 @@
-semantic_models:
-  - name: total_sales_semantic
-    model: ref('mrt_total_sales')
-    
-    defaults:
-      agg_time_dimension: order_date
+models:
+  - name: mrt_total_sales
+    semantic_model:
+      enabled: true
+      name: total_sales_semantic
+    agg_time_dimension: order_date
 
-    entities:
-      # 主キー（Primary Entity）が必須なので、コピーしてダミーを作る影分身の術
-      - name: date_id
-        type: primary
-        expr: order_date 
-
-    dimensions:
-      # 元々の order_date は純粋な「時間軸」として扱う
+    columns:
+      # 元々の order_date は純粋な「時間軸」として登録
       - name: order_date
-        type: time
-        type_params:
-          time_granularity: day
+        granularity: day
+        dimension:
+          type: time
 
-    measures:
-      - name: daily_revenue
+    # ↓ここが最新仕様の「影分身」の作り方です！
+    derived_semantics:
+      entities:
+        - name: date_id        # 主キー専用のダミー列
+          type: primary
+          expr: order_date     # order_dateの中身をコピー
+
+    # 中間指標（measures）を挟まず、直接metricsを書けるのが新しい仕様の強みです
+    metrics:
+      - name: revenue
+        description: "総売上"
+        type: simple
+        label: "売上"
         expr: total_revenue
         agg: sum
-      - name: daily_order_count
+
+      - name: orders
+        description: "総注文数"
+        type: simple
+        label: "注文数"
         expr: order_count
         agg: sum
-
-metrics:
-  - name: revenue
-    description: "総売上"
-    type: simple
-    label: "売上"
-    type_params:
-      measure: daily_revenue
-
-  - name: orders
-    description: "総注文数"
-    type: simple
-    label: "注文数"
-    type_params:
-      measure: daily_order_count
