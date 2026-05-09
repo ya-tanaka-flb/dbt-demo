@@ -1,18 +1,11 @@
 models:
   - name: metricflow_time_spine
-    semantic_model:
-      enabled: true
-      name: metricflow_time_spine
-    agg_time_dimension: date_day
-
+    description: "セマンティックレイヤー用のカレンダーテーブル"
+    # ↓これが最新仕様の魔法の1行です！
+    time_spine:
+      standard_granularity_column: date_day
+      
     columns:
       - name: date_day
+        description: "基準となる日付カラム"
         granularity: day
-        dimension:
-          type: time
-
-    derived_semantics:
-      entities:
-        - name: date_day_id
-          type: primary
-          expr: date_day
