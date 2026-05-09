@@ -1,28 +1,42 @@
-models:
-  - name: mrt_total_sales
-    semantic_model:
-      enabled: true
-      name: total_sales_semantic
-      
-    agg_time_dimension: order_date
+semantic_models:
+  - name: total_sales_semantic
+    model: ref('mrt_total_sales')
+    
+    defaults:
+      agg_time_dimension: order_date
 
-    columns:
+    entities:
+      # 主キー（Primary Entity）が必須なので、コピーしてダミーを作る影分身の術
+      - name: date_id
+        type: primary
+        expr: order_date 
+
+    dimensions:
+      # 元々の order_date は純粋な「時間軸」として扱う
       - name: order_date
-        granularity: day
-        dimension:
-          type: time
+        type: time
+        type_params:
+          time_granularity: day
 
-    metrics:
-      - name: revenue
-        description: "総売上"
-        type: simple
-        label: "売上"
+    measures:
+      - name: daily_revenue
         expr: total_revenue
         agg: sum
-
-      - name: orders
-        description: "総注文数"
-        type: simple
-        label: "注文数"
+      - name: daily_order_count
         expr: order_count
         agg: sum
+
+metrics:
+  - name: revenue
+    description: "総売上"
+    type: simple
+    label: "売上"
+    type_params:
+      measure: daily_revenue
+
+  - name: orders
+    description: "総注文数"
+    type: simple
+    label: "注文数"
+    type_params:
+      measure: daily_order_count
