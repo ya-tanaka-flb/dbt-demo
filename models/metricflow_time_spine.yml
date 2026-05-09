@@ -1,0 +1,18 @@
+models:
+  - name: metricflow_time_spine
+    semantic_model:
+      enabled: true
+      name: metricflow_time_spine
+    agg_time_dimension: date_day
+
+    columns:
+      - name: date_day
+        granularity: day
+        dimension:
+          type: time
+
+    derived_semantics:
+      entities:
+        - name: date_day_id
+          type: primary
+          expr: date_day
