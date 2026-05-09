@@ -1,37 +1,28 @@
-semantic_models:
-  - name: total_sales_semantic
-    description: "日別売上のセマンティックモデル"
-    model: ref('mrt_total_sales')
-    defaults:
-      agg_time_dimension: order_date
+models:
+  - name: mrt_total_sales
+    semantic_model:
+      enabled: true
+      name: total_sales_semantic
+      
+    agg_time_dimension: order_date
 
-    dimensions:
+    columns:
       - name: order_date
-        type: time
-        type_params:
-          time_granularity: day
+        granularity: day
+        dimension:
+          type: time
 
-    measures:
-      - name: daily_revenue
-        description: "日別の売上合計"
+    metrics:
+      - name: revenue
+        description: "総売上"
+        type: simple
+        label: "売上"
         expr: total_revenue
         agg: sum
-      - name: daily_order_count
-        description: "日別の注文数"
+
+      - name: orders
+        description: "総注文数"
+        type: simple
+        label: "注文数"
         expr: order_count
         agg: sum
-
-metrics:
-  - name: revenue
-    description: "総売上"
-    type: simple
-    label: "売上"
-    type_params:
-      measure: daily_revenue
-
-  - name: orders
-    description: "総注文数"
-    type: simple
-    label: "注文数"
-    type_params:
-      measure: daily_order_count
